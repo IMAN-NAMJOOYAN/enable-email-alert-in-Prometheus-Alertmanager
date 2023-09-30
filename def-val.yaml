@@ -1,0 +1,61 @@
+#Alert Manager Configuration
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    image:
+      registry: <Your Registry Name or IP Address>:<port>
+      repository: prometheus/alertmanager
+      tag: v0.25.0
+      sha: ""
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+  config:
+    global:
+      resolve_timeout: 5m
+      smtp_require_tls: false
+    inhibit_rules:
+      - source_matchers:
+          - 'severity = critical'
+        target_matchers:
+          - 'severity =~ warning|info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'severity = warning'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'alertname = InfoInhibitor'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+    route:
+      group_by: ['alertname','namespace']
+      receiver: 'email-alert'
+      routes:
+        - receiver: 'email-alert'
+          group_wait: 50s
+          group_interval: 5m
+          repeat_interval: 12h
+    receivers:
+    - name: 'email-alert'
+      email_configs:
+      - to: test@gmail.com
+        from: alert-prom@gmail.com
+        smarthost: mail.test.com:587
+        auth_username: alert-prom@gmail.com
+        auth_identity: alert-prom@gmail.com
+        auth_password: PassWord1234
+        require_tls: false
+        send_resolved: true
