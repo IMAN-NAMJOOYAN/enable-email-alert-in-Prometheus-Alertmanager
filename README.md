@@ -1,7 +1,7 @@
 # enable-email-alert-in-Prometheus-Alertmanager
 We have using prometheus-stack from "https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack".
 Before enabling email alert you can customize helm default values.
-We prepare a customize default values that enable email alert in prometheus alertmanager.
+We prepare a customize default values (def-val.yaml) that enable email alert in prometheus alertmanager.
 you can pass customize default values by :
 ```
 helm install prometheus-stack kube-prometheus-stack-46.8.0.tgz --version 46.8.0 -n monitoring -f def-val.yaml --create-namespace
